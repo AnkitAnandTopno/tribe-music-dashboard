@@ -4,7 +4,7 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 // const server = "http://revivalsong.org.in/server";
 const server = "https://tribe-music-api.herokuapp.com/api";
-// const server = "http://localhost:5000/api";
+// const server = "http://localhost:5400/api";
 // const server = process.env.REACT_APP_SERVER_DEV;
 
 let source = axios.CancelToken.source();

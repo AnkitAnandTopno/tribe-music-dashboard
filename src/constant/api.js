@@ -98,7 +98,39 @@ const adminApi = {
   searchSongs: {
     type: POST_REQUEST,
     path: `${ADMIN}/searchSongs`
-  }
+  },
+  searchArtists: {
+    type: POST_REQUEST,
+    path: `${ADMIN}/searchArtists`
+  },
+  searchPlaylists: {
+    type: POST_REQUEST,
+    path: `${ADMIN}/searchPlaylists`
+  },
+  updateSongFeatured: {
+    type: POST_REQUEST,
+    path: `${ADMIN}/updateSongFeatured`
+  },
+  updateArtistFeatured: {
+    type: POST_REQUEST,
+    path: `${ADMIN}/updateArtistFeatured`
+  },
+  updatePlaylistFeatured: {
+    type: POST_REQUEST,
+    path: `${ADMIN}/updatePlaylistFeatured`
+  },
+  fetchSongFeatured: {
+    type: GET_REQUEST,
+    path: `${ADMIN}/fetchSongFeatured`
+  },
+  fetchArtistFeatured: {
+    type: GET_REQUEST,
+    path: `${ADMIN}/fetchArtistFeatured`
+  },
+  fetchPlaylistFeatured: {
+    type: GET_REQUEST,
+    path: `${ADMIN}/fetchPlaylistFeatured`
+  },
 }
 const constantApi = {
   getConstantList: {

@@ -28,11 +28,12 @@ import Cookies from "universal-cookie";
 import UnitInput from "components/CustomInput/unitInput";
 import { categoriesApi } from "constant/api";
 import { adminApi } from "constant/api";
+import { fileApi } from "constant/api";
 
 const cookies = new Cookies();
 
 //regex - ([S|M|K|B|Sa|E]\s)?[0-9]+
-class AddPublisher extends Component {
+class SelectImage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -60,28 +61,23 @@ class AddPublisher extends Component {
 
     this.setState({ emptyFields: newEmptyFields });
   }
-  submit = (publisherId) => {
-    let {onClose} = this.props;
-    let checkState = _.cloneDeep(this.state);
-    checkState = _.omit(checkState, [
-      "isLoading",
-    ]);
+  addAlbumArt = (link) => {
+    let {onClose, publisherId} = this.props;
     this.setState({ isLoading: true });
       const thenFn = res => {
         this.setState({
-        name: undefined,
-        pictureUrl: undefined,
-        isLoading: false},()=>{onClose(true);});
+        selectedAlbumArt: link,
+        albumArts:res&&res.data||[],
+        isLoading: false});
       };
       const errorFn = (err) => {
           console.log(err);
         this.setState({ isLoading: false });
-        alert(`Error: ${err}`);
       };
-      sendRequest(adminApi.addArtist, {
-        publisherId,
-        ...checkState,
+      sendRequest(adminApi.addAlbumArt, {
+        publisherId,      
         adminId: cookies.get("userId"),
+        albumArtUrl: link,
         success: { fn: thenFn },
         error: { fn: errorFn }
       });
@@ -157,37 +153,30 @@ class AddPublisher extends Component {
       error: { fn: errorFn }
     });
   }
-  fetchItemDetails(id) {
+  fetchAlbumArt() {
     this.setState({ isLoading: true });
     const thenFn = res => {
-      let { data, isVariant } = res;
-      let newData = data;
-      if (isVariant) {
-        //don't change if isVariant true
-        newData = _.omit(newData, ["isVariant", "item"]);
-      }
+      let { data } = res;
       this.setState({
-        ...newData,
-        isLoading: false,
-        emptyFields: {
-          name: { empty: false, prestine: true },
-          imageUrls: { empty: false, prestine: true }
-        }
+        albumArts: data,
+        isLoading: false
       });
+      console.log(data);
     };
     const errorFn = error => {
+      console.error(error);
       this.setState({ isLoading: false });
-      alert("Something went wrong. Please try again later.");
+      alert(`${error&&error.message}`);
     };
-    sendRequest(itemApi.getItems, {
+    sendRequest(adminApi.getAlbumArt, {
       success: { fn: thenFn },
       error: { fn: errorFn },
-      id,
       adminId: cookies.get("userId")
     });
   }
   componentDidMount() {
     let { publisherId } = this.props;
+    this.fetchAlbumArt();
     if (publisherId) {
       // this.fetchItemDetails(publisherId);
     }
@@ -195,16 +184,17 @@ class AddPublisher extends Component {
   render() {
     const {
       isLoading,
-      pictureUrl
+      pictureUrl,
+      albumArts, selectedAlbumArt
     } = this.state;
-    let { match, onClose, isVisible, publisherId } = this.props;
+    
+    let { match, onClose, onSubmit, isVisible, publisherId } = this.props;
     let id = match && match.params && match.params.id;
     return (
-      <Modal buttonLabel="Name" className="modal" headerTitle="Add New Artist" 
-      onSuccess={()=>{this.submit(publisherId)}}
+      <Modal buttonLabel="Name" className="modal" headerTitle="Select Image" 
+      onSuccess={()=>{onSubmit(selectedAlbumArt)}}
       onClose={()=>{
           this.setState({
-        name: undefined,
         pictureUrl: undefined
         },()=>onClose());
         }}
@@ -212,40 +202,30 @@ class AddPublisher extends Component {
       isCancelButtonActive={isLoading?true:false}
     isVisible={isVisible}
       >
-        {isLoading ? (
-          <CircularProgress color="secondary" />
-        ) : (
             <Form>
             <FormGroup>
               <GridContainer>
-              <GridItem><CustomInput
-              labelText="Artist Name"
-              id="name"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                value: this.state.name,
-                onChange: e => {
-                  this.setState({
-                   name: e.target.value
-                  });
-                }
-              }}
-            /></GridItem>
               
+        {isLoading ? (
+          <CircularProgress color="secondary" />
+        ) : (<div style={{width: 500, display: "flex", flexDirection: "row"}}>{_.map(albumArts, (item, index)=>{
+          return <div onClick={()=>{this.setState({selectedAlbumArt: item.albumArtUrl})}} key={item._id} style={{
+            border: `5px ${item.albumArtUrl===selectedAlbumArt?"red":"white"} solid`,
+            margin: 10,width: 100, height: 100, cursor: "pointer"}}>
+            <img style={{width: 100, height: 100}} src={item.albumArtUrl}/>
+          </div>
+        })}</div>)}
               </GridContainer>
               <GridContainer>
               <GridItem><Uploader
-              value={pictureUrl}
+              value={selectedAlbumArt}
               onChange={link => {
-                this.setState({ pictureUrl: link });
+                this.addAlbumArt(link);
               }}
             /></GridItem>
               </GridContainer>
             </FormGroup>
           </Form>
-        )}
         
         </Modal>
     );
@@ -262,5 +242,5 @@ export default withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(AddPublisher)
+  )(SelectImage)
 );

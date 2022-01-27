@@ -60,17 +60,20 @@ class AddPublisher extends Component {
 
     this.setState({ emptyFields: newEmptyFields });
   }
-  submit = (publisherId) => {
-    let {onClose} = this.props;
+  submit = () => {
+      let {onClose} = this.props;
     let checkState = _.cloneDeep(this.state);
     checkState = _.omit(checkState, [
       "isLoading",
     ]);
     this.setState({ isLoading: true });
       const thenFn = res => {
-        this.setState({
-        name: undefined,
-        pictureUrl: undefined,
+        this.setState({companyName: "",
+        nameOfHead: undefined,
+        email: undefined,
+        password: undefined,
+        contactNumber: null,
+        validity: null,
         isLoading: false},()=>{onClose(true);});
       };
       const errorFn = (err) => {
@@ -78,10 +81,9 @@ class AddPublisher extends Component {
         this.setState({ isLoading: false });
         alert(`Error: ${err}`);
       };
-      sendRequest(adminApi.addArtist, {
-        publisherId,
-        ...checkState,
+      sendRequest(adminApi.addPublisher, {
         adminId: cookies.get("userId"),
+        ...checkState,
         success: { fn: thenFn },
         error: { fn: errorFn }
       });
@@ -189,24 +191,25 @@ class AddPublisher extends Component {
   componentDidMount() {
     let { publisherId } = this.props;
     if (publisherId) {
-      // this.fetchItemDetails(publisherId);
+      this.fetchItemDetails(publisherId);
     }
   }
   render() {
     const {
       isLoading,
-      pictureUrl
     } = this.state;
-    let { match, onClose, isVisible, publisherId } = this.props;
+    let { match, onClose, isVisible } = this.props;
     let id = match && match.params && match.params.id;
     return (
-      <Modal buttonLabel="Name" className="modal" headerTitle="Add New Artist" 
-      onSuccess={()=>{this.submit(publisherId)}}
+      <Modal buttonLabel="Name" className="modal" headerTitle="Add New Publisher" 
+      onSuccess={()=>{this.submit()}}
       onClose={()=>{
-          this.setState({
-        name: undefined,
-        pictureUrl: undefined
-        },()=>onClose());
+          this.setState({companyName: "",
+        nameOfHead: undefined,
+        email: undefined,
+        password: undefined,
+        contactNumber: null,
+        validity: null},()=>onClose(false));
         }}
       isSuccessButtonActive={isLoading?true:false}
       isCancelButtonActive={isLoading?true:false}
@@ -219,27 +222,99 @@ class AddPublisher extends Component {
             <FormGroup>
               <GridContainer>
               <GridItem><CustomInput
-              labelText="Artist Name"
-              id="name"
+              labelText="Company Name"
+              id="companyName"
               formControlProps={{
                 fullWidth: true
               }}
               inputProps={{
-                value: this.state.name,
+                value: this.state.companyName,
                 onChange: e => {
                   this.setState({
-                   name: e.target.value
+                    companyName: e.target.value
                   });
                 }
               }}
             /></GridItem>
-              
+              <GridItem><CustomInput
+              labelText="Name Of Owner"
+              id="nameOfHead"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                value: this.state.nameOfHead,
+                onChange: e => {
+                  this.setState({
+                    nameOfHead: e.target.value
+                  });
+                }
+              }}
+            /></GridItem></GridContainer>
+            <GridContainer>
+              <GridItem><CustomInput
+              labelText="E-mail Address"
+              id="email"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                value: this.state.email,
+                onChange: e => {
+                  this.setState({
+                    email: e.target.value
+                  });
+                }
+              }}
+            /></GridItem>
+              <GridItem><CustomInput
+              labelText="Password"
+              id="password"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                type: "password",
+                value: this.state.password,
+                onChange: e => {
+                  this.setState({
+                    password: e.target.value
+                  });
+                }
+              }}
+            /></GridItem>
               </GridContainer>
               <GridContainer>
-              <GridItem><Uploader
-              value={pictureUrl}
-              onChange={link => {
-                this.setState({ pictureUrl: link });
+              <GridItem><CustomInput
+              labelText="Contact Number"
+              id="contact"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                type: "number",
+                value: this.state.contact,
+                onChange: e => {
+                  this.setState({
+                    contactNumber: e.target.value
+                  });
+                }
+              }}
+            /></GridItem>
+              <GridItem><CustomInput
+              labelText="Validity"
+              id="validity"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                type: "date",
+                value: this.state.validity,
+                onChange: e => {
+                  this.setState({
+                    validity: e.target.value
+                  });
+                }
               }}
             /></GridItem>
               </GridContainer>

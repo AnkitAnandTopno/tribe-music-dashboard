@@ -81,7 +81,6 @@ class AddPublisher extends Component {
       sendRequest(adminApi.addArtist, {
         publisherId,
         ...checkState,
-        adminId: cookies.get("userId"),
         success: { fn: thenFn },
         error: { fn: errorFn }
       });

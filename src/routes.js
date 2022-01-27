@@ -41,6 +41,7 @@ import RTLPage from "views/RTLPage/RTLPage.js";
 import AddItems from "views/Items/addItems";
 import ItemList from "views/Items/itemList";
 import AddPlaylist from "views/Groups/addItems";
+import UpdatedFeatured from "views/Featured/addItems";
 import PlaylistList from "views/Groups/itemList";
 import AddOfferForm from "views/Offers/offerList/addOfferForm";
 import OfferList from "views/Offers/offerList";
@@ -106,6 +107,15 @@ const dashboardRoutes = [
     rtlName: "Item List",
     icon: "mdi-playlist-music",
     component: PlaylistList,
+    layout: "/admin"
+  },
+  
+  {
+    path: "/updateFeatured",
+    name: "Featured",
+    rtlName: "Featured",
+    icon: "mdi-star",
+    component: UpdatedFeatured,
     layout: "/admin"
   },
   {
